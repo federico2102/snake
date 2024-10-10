@@ -1,0 +1,48 @@
+# Ignore CMake generated files
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+Makefile
+build/
+cmake-build-debug/
+cmake-build-release/
+*.cbp
+*.depend
+*.layout
+*.vcxproj*
+*.sln
+*.ninja
+*.swp
+
+# Ignore build artifacts and intermediate files
+*.o
+*.obj
+*.so
+*.dylib
+*.dll
+*.lib
+*.exe
+*.out
+*.log
+
+# Ignore IDE specific files (if using CLion or Visual Studio)
+.idea/
+.vscode/
+*.iml
+*.user
+*.opencmd
+*.workspace
+
+# Ignore generated files by editors
+*.DS_Store
+*.swo
+
+# Ignore debugging symbols
+*.dSYM/
+*.pdb
+
+# Ignore any backup files
+*~
+
+# Ignore additional temporary files
+tmp/

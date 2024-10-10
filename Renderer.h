@@ -85,7 +85,7 @@ inline void Renderer::setTextColor(bool isActiveCell) {
     }
 }
 
-#endif  // End platform-specific code
+#endif  // _WIN32
 
 inline void Renderer::signalHandler(int signum) {
     moveCursorBelowGrid(globalGridHeight);  // Use global variable for grid height
