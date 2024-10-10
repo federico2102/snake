@@ -1,10 +1,12 @@
 #include "Game.h"
+
+#include <conio.h>
+
 #include "Renderer.h"
 #include <iostream>
 #include <cstdlib>
 #include <ctime>
-
-bool isFirstRender = true;  // Track if it's the first render
+#include <thread>
 
 // Constructor
 template<typename T>
@@ -94,7 +96,7 @@ void Game<T>::setDirection(int dx, int dy) {
 
 // Display the grid
 template<typename T>
-void Game<T>::displayGrid() {
+void Game<T>::displayGrid(bool &isFirstRender) {
     Renderer::printGrid(grid, previousGrid, isFirstRender);  // The renderer will display the grid with the chosen symbols
     isFirstRender = false;
     previousGrid = grid;
@@ -105,6 +107,45 @@ template<typename T>
 bool Game<T>::getGameOver() const {
     Renderer::moveCursorBelowGrid(grid.getHeight());  // Move cursor two lines below the grid
     return isGameOver;
+}
+
+template<typename T>
+void Game<T>::start() {
+    bool isFirstRender = true;  // Track if it's the first render
+
+    Renderer::setupSignalHandler(grid.getHeight());
+
+    auto lastMoveTime = std::chrono::steady_clock::now();
+
+    // Game loop
+    while (!this->getGameOver()) {
+        // Handle input (W, A, S, D)
+        if (_kbhit()) {
+            char key = _getch();  // Get the pressed key
+            switch (key) {
+                case 'w': this->setDirection(-1, 0); break;  // Move up
+                case 's': this->setDirection(1, 0); break;   // Move down
+                case 'a': this->setDirection(0, -1); break;  // Move left
+                case 'd': this->setDirection(0, 1); break;   // Move right
+                default: break;
+            }
+        }
+
+        auto currentTime = std::chrono::steady_clock::now();
+        std::chrono::duration<double, std::milli> timeSinceLastMove = currentTime - lastMoveTime;
+
+        // Move the snake at a slower speed (e.g., every 200 milliseconds)
+        if (constexpr int snakeSpeed = 200; timeSinceLastMove.count() >= snakeSpeed) {
+            this->update();  // Update the snake's position
+            this->displayGrid(isFirstRender);  // Only update the specific parts of the grid that changed
+            lastMoveTime = currentTime;  // Update last move time
+        }
+
+        // Small delay to avoid CPU overuse
+        std::this_thread::sleep_for(std::chrono::milliseconds(1));
+    }
+
+    std::cout << "Game Over!" << std::endl;
 }
 
 // Explicit template instantiation for char (if needed)

@@ -28,9 +28,10 @@ public:
     bool checkCollision(const std::pair<int, int>& newHead) const; // Check for collisions
     void update(); // Update the game state
     bool getGameOver() const; // Check if the game is over
+    void start();
 
     void setDirection(int dx, int dy); // Update snake's direction
-    void displayGrid(); // Display grid (console-based for now)
+    void displayGrid(bool &isFirstRender); // Display grid (console-based for now)
 };
 
 #endif // GAME_H
