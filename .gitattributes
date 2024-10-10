@@ -1,0 +1,11 @@
+# Set default behavior to automatically normalize line endings
+* text=auto
+
+# Force Unix-style (LF) line endings for specific files
+*.cpp text eol=lf
+*.h text eol=lf
+*.txt text eol=lf
+*.sh text eol=lf
+
+# Use Windows-style (CRLF) line endings for batch scripts
+*.bat text eol=crlf
