@@ -4,10 +4,13 @@
 #include <cstdlib>
 #include <ctime>
 
+bool isFirstRender = true;  // Track if it's the first render
+
 // Constructor
 template<typename T>
 Game<T>::Game(int width, int height, T snakeSymbol, T appleSymbol, T emptySymbol)
-    : grid(width, height, emptySymbol), direction({0, 1}), isGameOver(false),
+    : grid(width, height, emptySymbol), previousGrid(width, height, emptySymbol),
+        direction({0, 1}), isGameOver(false),
       snakeSymbol(snakeSymbol), appleSymbol(appleSymbol), emptySymbol(emptySymbol) {
     initializeGame();
 }
@@ -18,6 +21,7 @@ void Game<T>::initializeGame() {
     // Initialize the snake in the center
     snake = {{grid.getWidth() / 2, grid.getHeight() / 2}};
     grid.setCell(snake.front().first, snake.front().second, snakeSymbol);
+    previousGrid = grid; // Initialize previousGrid to match current grid
 
     // Place the first piece of food
     placeFood();
@@ -77,6 +81,7 @@ bool Game<T>::checkCollision(const std::pair<int, int>& newHead) const {
 template<typename T>
 void Game<T>::update() {
     if (!isGameOver) {
+        previousGrid = grid; // Store the previous state of the grid before updating
         moveSnake();
     }
 }
@@ -89,13 +94,16 @@ void Game<T>::setDirection(int dx, int dy) {
 
 // Display the grid
 template<typename T>
-void Game<T>::displayGrid() const {
-    Renderer::printGrid(grid);  // The renderer will display the grid with the chosen symbols
+void Game<T>::displayGrid() {
+    Renderer::printGrid(grid, previousGrid, isFirstRender);  // The renderer will display the grid with the chosen symbols
+    isFirstRender = false;
+    previousGrid = grid;
 }
 
 // Get the game-over state
 template<typename T>
 bool Game<T>::getGameOver() const {
+    Renderer::moveCursorBelowGrid(grid.getHeight());  // Move cursor two lines below the grid
     return isGameOver;
 }
 

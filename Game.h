@@ -9,6 +9,7 @@ template<typename T>
 class Game {
 private:
     Grid<T> grid;
+    Grid<T> previousGrid;
     std::list<std::pair<int, int>> snake; // Coordinates of the snake
     std::pair<int, int> direction; // Current direction of movement
     std::pair<int, int> foodPosition;
@@ -29,7 +30,7 @@ public:
     bool getGameOver() const; // Check if the game is over
 
     void setDirection(int dx, int dy); // Update snake's direction
-    void displayGrid() const; // Display grid (console-based for now)
+    void displayGrid(); // Display grid (console-based for now)
 };
 
 #endif // GAME_H
