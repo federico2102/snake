@@ -1,6 +1,4 @@
-### `README.md` Template:
-
-```md
+---
 # Snake Game
 
 This is a console-based Snake game implemented in C++ that reuses several modules, such as `CircularMatrix`, `Grid`, and `Renderer`, originally developed for Conway's Game of Life. The game has been designed with modularity and code reuse in mind, allowing these components to be shared across different projects.
@@ -17,7 +15,6 @@ This is a console-based Snake game implemented in C++ that reuses several module
 - [Usage](#usage)
 - [Code Reusability](#code-reusability)
 - [Renderer Implementation](#renderer-implementation)
-- [License](#license)
 
 ## Installation
 
@@ -83,3 +80,4 @@ Renderer::printGrid(grid, previousGrid, isFirstRender);
 ```
 
 By reusing the same `Renderer` in multiple projects (such as Snake and Conway's Game of Life), we maintain a consistent approach to rendering and make the system more maintainable.
+---
