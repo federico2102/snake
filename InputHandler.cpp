@@ -27,6 +27,7 @@ void InputHandler::handleInput(Game &game) {
             case 80: game.setDirection2(1, 0); break;   // Down arrow
             case 75: game.setDirection2(0, -1); break;  // Left arrow
             case 77: game.setDirection2(0, 1); break;   // Right arrow
+            default: break;
         }
     }
 }

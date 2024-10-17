@@ -179,7 +179,7 @@ void Game::start() {
 
     // Game loop
     while (!this->getGameOver()) {
-        // Handle input (track keypresses)
+        // Handle input (track key presses)
         InputHandler::handleInput(*this);
 
         auto currentTime = std::chrono::steady_clock::now();
