@@ -18,7 +18,7 @@ int main() {
         std::tolower(defaultSetup);
     }
 
-    if (defaultSetup == 'N') {
+    if (defaultSetup == 'n') {
         std::cout << "Enter grid width: " << std::endl;
         std::cin >> gridWidth;
         std::cout << "Enter grid height: " << std::endl;
@@ -32,7 +32,7 @@ int main() {
     }
 
     try {
-        // Create a game with a 20x20 grid and the chosen symbols
+        // Create a game with a grid and the chosen symbols
         Game<char> game(gridHeight, gridWidth, snakeChar, appleChar, emptyChar);
         game.start();
     } catch (const std::invalid_argument& e) {
