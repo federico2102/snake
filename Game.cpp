@@ -1,4 +1,6 @@
 #include "Game.h"
+#include "InputHandler.h"
+#include "CheatHandler.h"
 #include <conio.h>
 #include "Renderer.h"
 #include <iostream>
@@ -7,8 +9,8 @@
 #include <thread>
 
 // Constructor
-template<typename T>
-Game<T>::Game(int width, int height, T snakeSymbol1, T snakeSymbol2, T appleSymbol, T emptySymbol, bool isMultiplayer)
+Game::Game(const int width, const int height, const char snakeSymbol1, const char snakeSymbol2, const char appleSymbol,
+           const char emptySymbol, const bool isMultiplayer)
     : grid(width, height, emptySymbol), previousGrid(width, height, emptySymbol),
       direction1({0, 1}), direction2({0, -1}), isGameOver(false),
       isMultiplayer(isMultiplayer), applesEaten(0), snakeSpeed(200), playerWhoLost(0),
@@ -19,50 +21,8 @@ Game<T>::Game(int width, int height, T snakeSymbol1, T snakeSymbol2, T appleSymb
     std::fill(std::begin(keys), std::end(keys), false);
 }
 
-// Handle key presses and releases
-template<typename T>
-void Game<T>::handleInput() {
-    if (_kbhit()) {
-        int key = _getch();
-        // For arrow keys, _getch() returns 0 or 224 first, then the actual key code
-        if (key == 0 || key == 224) {
-            key = _getch();
-        }
-
-        // Mark key as pressed
-        if(key != 'a' && key != 'd' && key != 75 && key != 77 && key != '1' && key != '2' && key != '3') {
-            keys['a'] = false;
-            keys['d'] = false;
-            keys[75] = false;
-            keys[77] = false;
-        } else {
-            keys[key] = true;
-        }
-
-        // Handle movement for Player 1 (W, A, S, D)
-        switch (key) {
-            case 'w': case 'W': setDirection1(-1, 0); break;  // Move up
-            case 's': case 'S': setDirection1(1, 0); break;   // Move down
-            case 'a': case 'A': setDirection1(0, -1); break;  // Move left
-            case 'd': case 'D': setDirection1(0, 1); break;   // Move right
-        }
-
-        // Handle movement for Player 2 (Arrow keys)
-        if (key == 0 || key == 224) {
-            key = _getch();
-            switch (key) {
-                case 72: setDirection2(-1, 0); break;   // Up arrow
-                case 80: setDirection2(1, 0); break;    // Down arrow
-                case 75: setDirection2(0, -1); break;   // Left arrow
-                case 77: setDirection2(0, 1); break;    // Right arrow
-            }
-        }
-    }
-}
-
 // Initialize game elements
-template<typename T>
-void Game<T>::initializeGame() {
+void Game::initializeGame() {
     // Initialize snake 1 in the center
     snake1 = {{grid.getWidth() / 2, grid.getHeight() / 2}};
     grid.setCell(snake1.front().first, snake1.front().second, snakeSymbol1);
@@ -79,8 +39,7 @@ void Game<T>::initializeGame() {
 }
 
 // Generate multiple food positions (apples) on the grid
-template<typename T>
-void Game<T>::generateFoodPositions(int numApples) {
+void Game::generateFoodPositions(const int numApples) {
     foodPositions.clear(); // Clear any existing food positions
 
     srand(static_cast<unsigned int>(time(nullptr)) + applesEaten); // Ensure better randomness
@@ -98,28 +57,9 @@ void Game<T>::generateFoodPositions(int numApples) {
     }
 }
 
-// Grow the snake by a certain number of segments
-template<typename T>
-void Game<T>::growSnake(std::list<std::pair<int, int>>& snake, int growth) {
-    auto tail = snake.back(); // Capture the tail before growing
-    for (int i = 0; i < growth; ++i) {
-        snake.push_back(tail); // Add new segments at the tail position
-    }
-}
-
-// Activate paradise mode (lots of apples everywhere, limited to 25% of the grid)
-template<typename T>
-void Game<T>::activateParadiseMode() {
-    paradiseModeActive = true;
-
-    // Limit apples to 25% of the grid size
-    int maxApples = (grid.getWidth() * grid.getHeight()) / 8;
-    generateFoodPositions(maxApples);
-}
-
 // Move the snake in the current direction
-template<typename T>
-void Game<T>::moveSnake(std::list<std::pair<int, int>>& snake, const std::pair<int, int>& direction, T snakeSymbol, int playerNumber) {
+void Game::moveSnake(std::list<std::pair<int, int>>& snake, const std::pair<int, int>& direction,
+    const char snakeSymbol, const int playerNumber) {
     auto newHead = std::make_pair(snake.front().first + direction.first,
                                   snake.front().second + direction.second);
 
@@ -174,8 +114,7 @@ void Game<T>::moveSnake(std::list<std::pair<int, int>>& snake, const std::pair<i
     }
 }
 
-template<typename T>
-bool Game<T>::checkCollision(const std::pair<int, int>& newHead, const std::list<std::pair<int, int>>& snake) {
+bool Game::checkCollision(const std::pair<int, int>& newHead, const std::list<std::pair<int, int>>& snake) {
     for (const auto& segment : snake) {
         if (newHead == segment) {
             return true; // Collision detected
@@ -184,36 +123,8 @@ bool Game<T>::checkCollision(const std::pair<int, int>& newHead, const std::list
     return false;
 }
 
-// Check for cheat combinations
-template<typename T>
-void Game<T>::checkForCheats() {
-    // Cheat for player 1: 'A' and 'D' pressed at the same time
-    if (keys['a'] && keys['d']) {
-        growSnake(snake1, 3);
-        keys['a'] = false;
-        keys['d'] = false;
-    }
-
-    // Cheat for player 2: Left and Right arrows pressed at the same time
-    if (keys[75] && keys[77]) {  // 75 is Left arrow, 77 is Right arrow
-        growSnake(snake2, 3);
-        keys[75] = false;
-        keys[77] = false;
-    }
-
-    // Paradise mode: '1', '2', and '3' pressed at the same time
-    if (keys['1'] && keys['2'] && keys['3']) {
-        activateParadiseMode();
-        keys['1'] = false;
-        keys['2'] = false;
-        keys['3'] = false;
-    }
-}
-
-
 // Update game state (move snakes)
-template<typename T>
-void Game<T>::update() {
+void Game::update() {
     if (!isGameOver) {
         previousGrid = grid; // Store the previous state of the grid before updating
 
@@ -226,13 +137,12 @@ void Game<T>::update() {
         }
 
         // Check for cheat codes
-        checkForCheats();
+        CheatHandler::checkForCheats(*this, snake1, snake2);
     }
 }
 
 // Set the direction of snake 1
-template<typename T>
-void Game<T>::setDirection1(int dx, int dy) {
+void Game::setDirection1(int dx, int dy) {
     // Prevent the snake from reversing into itself
     if (dx != -direction1.first || dy != -direction1.second) {
         direction1 = {dx, dy};
@@ -240,8 +150,7 @@ void Game<T>::setDirection1(int dx, int dy) {
 }
 
 // Set the direction of snake 2
-template<typename T>
-void Game<T>::setDirection2(int dx, int dy) {
+void Game::setDirection2(int dx, int dy) {
     // Prevent the snake from reversing into itself
     if (dx != -direction2.first || dy != -direction2.second) {
         direction2 = {dx, dy};
@@ -249,22 +158,19 @@ void Game<T>::setDirection2(int dx, int dy) {
 }
 
 // Display the grid
-template<typename T>
-void Game<T>::displayGrid(bool& isFirstRender) {
+void Game::displayGrid(bool& isFirstRender) {
     Renderer::printGrid(grid, previousGrid, isFirstRender);  // The renderer will display the grid with the chosen symbols
     isFirstRender = false;
     previousGrid = grid;
 }
 
 // Get the game-over state
-template<typename T>
-bool Game<T>::getGameOver() const {
+bool Game::getGameOver() const {
     Renderer::moveCursorBelowGrid(grid.getHeight());  // Move cursor two lines below the grid
     return isGameOver;
 }
 
-template<typename T>
-void Game<T>::start() {
+void Game::start() {
     bool isFirstRender = true;  // Track if it's the first render
 
     Renderer::setupSignalHandler(grid.getHeight());
@@ -274,7 +180,7 @@ void Game<T>::start() {
     // Game loop
     while (!this->getGameOver()) {
         // Handle input (track keypresses)
-        handleInput();
+        InputHandler::handleInput(*this);
 
         auto currentTime = std::chrono::steady_clock::now();
         std::chrono::duration<double, std::milli> timeSinceLastMove = currentTime - lastMoveTime;
@@ -297,6 +203,3 @@ void Game<T>::start() {
         std::cout << "Game Over!" << std::endl;
     }
 }
-
-// Explicit template instantiation for char
-template class Game<char>;
