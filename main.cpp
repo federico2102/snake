@@ -31,8 +31,10 @@ int main() {
         std::cin >> gridHeight;
         std::cout << "Enter symbol for snake 1: " << std::endl;
         std::cin >> snakeChar1;
-        std::cout << "Enter symbol for snake 2: " << std::endl;
-        std::cin >> snakeChar2;
+        if(isMultiplayer) {
+            std::cout << "Enter symbol for snake 2: " << std::endl;
+            std::cin >> snakeChar2;
+        }
         std::cout << "Enter symbol for apple: " << std::endl;
         std::cin >> appleChar;
         std::cout << "Enter symbol for empty spaces: " << std::endl;
