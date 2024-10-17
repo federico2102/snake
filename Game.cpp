@@ -30,7 +30,14 @@ void Game<T>::handleInput() {
         }
 
         // Mark key as pressed
-        keys[key] = true;
+        if(key != 'a' && key != 'd' && key != 75 && key != 77 && key != '1' && key != '2' && key != '3') {
+            keys['a'] = false;
+            keys['d'] = false;
+            keys[75] = false;
+            keys[77] = false;
+        } else {
+            keys[key] = true;
+        }
 
         // Handle movement for Player 1 (W, A, S, D)
         switch (key) {
